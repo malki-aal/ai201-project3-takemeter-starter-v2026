@@ -42,6 +42,13 @@
 <!-- Your community, and what your classifier sorts posts into. Three or four
      sentences. -->
 
+TakeMeter reads comments from r/soccer, Reddit's general football community, and
+sorts each one by how it argues. `analysis` backs a claim with something you
+could check, such as a stat, a fee, a date or a named match. `hot_take` states a
+confident opinion with nothing checkable behind it. `reaction` is aimed at another
+commenter rather than at the football. The model is a DistilBERT fine-tuned on 200
+comments I labelled myself. It's meant to separate the comments that bring
+evidence from the ones that only bring confidence or an argument with another user.
 
 
 ---
@@ -112,7 +119,7 @@ emotion) were left out rather than given a fourth label.
 
 **How I labelled them:** I labelled 32 posts cold first, with no tools and only
 my definitions, and marked them `cold` in the note column. The other 168 were
-pre-labelled by an AI tool given my definitions; I then read and corrected each
+pre-labelled by an AI tool ([NAME THE TOOL YOU USED]) given my definitions; I then read and corrected each
 one, and they're marked `pre-labelled`. After the Milestone 2 decision rule was
 written, I re-checked every non-`analysis` post that contained a number or
 link, and every `analysis` post that didn't, against the rule. Three pre-labelled
@@ -191,19 +198,45 @@ changed.
      workflow and disclosing it costs you nothing. Not disclosing it is the
      problem. -->
 
-**Moment 1**
+**Moment 1: stress-testing the labels (Milestone 2)**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* I gave Claude (Claude Code, in VS Code) my three draft
+  definitions and asked for eight posts written to sit on the boundaries between
+  them.
+- *What came back:* Eight r/soccer-style posts. Five of them couldn't be
+  classified cleanly. For example, "Arteta's side can't win big games because
+  there's no plan B" gives a reason, so it didn't fit `hot_take` = "no support
+  offered". "You clearly didn't watch the match. Rice was everywhere" made
+  "mainly aimed at a commenter" a judgement call.
+- *What I changed:* I rewrote all three definitions around one test, whether
+  the post has a checkable specific. `hot_take` became "no checkable specific,
+  even if it gives reasons", and `reaction` became "aimed at a commenter or the
+  thread, with no checkable specific". I also wrote the decision rule in the
+  order fact → target → otherwise. The record is at the end of `reading_notes.md`.
 
-**Moment 2**
+**Moment 2: checking my labels against the rule (Milestone 4)**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* I asked Claude to check `labels.csv` against the new
+  decision rule.
+- *What came back:* A list of every non-`analysis` post containing a number or
+  link, and every `analysis` post without one, with a call on each. Three
+  pre-labelled posts broke the rule. One `hot_take` ended by calling the other
+  commenter "purposely dense", so it was really a `reaction`. One `hot_take`
+  named a checkable incident (CR7 leaving for Madrid). One `reaction` rested on
+  a checkable fact (the highest PL wage bill).
+- *What I changed:* I relabelled those three (marked `pre-labelled, corrected`)
+  and used two of them as hard cases. I left the cold labels alone, because
+  they're the honesty check for the agreement report.
 
-**Pre-labelling disclosure:**
+**Other AI help, disclosed:** Claude also drafted `criteria.md`, wrote the
+README write-ups (Label Taxonomy, The Dataset, The Training Run, this section),
+set up the `.venv` and ran notebook sections 1–5. I read and kept what it wrote.
+
+**Pre-labelling disclosure:** 32 posts were labelled cold by me with no tools
+(`cold` in the note column). The other 168 were pre-labelled by
+**[NAME THE TOOL YOU USED]** from my definitions, then read and corrected by me
+(`pre-labelled`). Three of those were corrected again after the Milestone 2
+rule was written (`pre-labelled, corrected`).
 
 <!-- ═══════════════════════ UNIT 6 — THE TEST ═══════════════════════
 
