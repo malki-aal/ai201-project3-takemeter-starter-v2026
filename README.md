@@ -160,15 +160,23 @@ changed.
 
 <!-- Your starting model, your settings, and anything you changed and why. -->
 
-**Base model:**
+**Base model:** `distilbert-base-uncased`
 
-**Settings:** <!-- epochs, learning rate, batch size, seed -->
+**Settings:** 3 epochs, learning rate 2e-5, batch size 16, max length 128 tokens, seed 42.
 
-**Anything I changed from the defaults, and why:**
+**Device:** `cpu` (PyTorch 2.14.1+cpu, Windows 11). The laptop has an NVIDIA RTX 3050, but the default `pip install` gave a CPU-only PyTorch build, so training ran on the CPU. This is recorded in `results.json`.
 
-**Split sizes:** <!-- train / val / test, and per-label counts in the test
-split. If a label had fewer than about 8 in test, say so — it explains a lot
-of next unit's variance. -->
+**Anything I changed from the defaults, and why:** Nothing. All settings are the notebook defaults.
+
+**Split sizes:** train 139 · val 31 · test 30
+
+| Label | train | val | test |
+|---|---|---|---|
+| `analysis` | 41 | 9 | 9 |
+| `hot_take` | 72 | 16 | 15 |
+| `reaction` | 26 | 6 | 6 |
+
+`reaction` has only 6 posts in the test split, under the ~8 the notebook warns about. One post more or less right moves its F1 a lot between seeds.
 
 
 
