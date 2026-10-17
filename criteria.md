@@ -51,63 +51,62 @@ whether you hit them:
 
 ---
 
-## 1.
+## 1. Overall accuracy is at least 0.65 on the held-out set, on every one of the three seeds
 
-<!-- Your criterion. It must name a number. -->
-
-
-
-**Why this target:**
-
-
-
----
-
-## 2.
-
-<!-- Your criterion. -->
-
-
-
-**Why this target:**
-
-
+**Why this target:** `hot_take` is 105 of my 200 posts, so a model that always
+guesses `hot_take` already scores about 0.52. That's the real floor, not the 0.33
+coin flip. The test split is about 30 posts, so 0.65 means roughly 20 right
+against the majority guesser's 16. Four extra posts per seed is a modest but
+real margin, and I'd call it useful. Anything higher would be optimistic for
+200 training examples when it has to hold on all three seeds.
 
 ---
 
-## 3.
+## 2. Macro F1 is at least 0.55 on the held-out set, on every one of the three seeds
 
-<!-- Your criterion. -->
-
-
-
-**Why this target:**
-
-
+**Why this target:** Accuracy alone can be gamed by leaning on `hot_take`. An
+always-`hot_take` model scores about 0.23 macro F1, because it gets 0 on the
+other two labels. Macro F1 weights my three labels equally, so it only passes if
+`analysis` and `reaction` are being found too. I set it 0.10 below the accuracy
+target because the small labels will drag the average down.
 
 ---
 
-## 4.
+## 3. Every label clears its own F1 floor on every seed: `hot_take` ≥ 0.65, `analysis` ≥ 0.55, `reaction` ≥ 0.40
 
-<!-- Your criterion. -->
-
-
-
-**Why this target:**
-
-
+**Why this target:** The floors follow how much data each label has and how
+easy its signal is. `hot_take` has 105 examples (~16 in each test split).
+`analysis` has 57 (~9 per split) and usually carries a visible cue: a number, a
+fee, a link. `reaction` has only 38 examples, so about 6 land in each test
+split and one wrong post moves its F1 by 0.10 or more. Its boundary also depends on
+spotting a "you" or "this thread" target *and* the absence of a fact, which is
+harder for a model than spotting a number. Below 0.40, `reaction` predictions
+would be wrong more often than right, and the label wouldn't be worth keeping.
 
 ---
 
-## 5.
+## 4. I agree with the staff labels on at least 80% of the 30 staff posts (24 of 30), measured by `agreement.py`
 
-<!-- Your criterion. -->
+**Why this target:** The model can't be more consistent than the labels it learns
+from, and this is my only outside check on my own labelling. The staff taxonomy
+comes with written decision rules, so a careful labeller should match on most
+posts. 80% allows about 6 disagreements, all on genuine boundary cases. There's
+a specific trap for me: staff `reaction` means "an immediate feeling about
+something that just happened". My `reaction` means "aimed at another commenter".
+If I slip into my own definition, I'll lose points on exactly those posts, and
+going below 80% would mean I'm not applying written rules as written.
 
+---
 
+## 5. The model's most-confident third of test predictions is at least 0.20 more accurate than its least-confident third, on every seed
 
-**Why this target:**
-
-
+**Why this target:** If confidence means anything, I should be able to trust the
+sure predictions more and send the unsure ones to a human. Each third of a
+30-post test set is about 10 posts, so 0.20 means at least 2 more right in the
+confident third. Anything smaller could come from one lucky post. I expect
+confident predictions to be the `analysis` posts with obvious numbers in them.
+I expect unsure ones to be on the `hot_take`/`reaction` boundary, where a
+"you" might or might not make the post about the person.
 
 ---
 
