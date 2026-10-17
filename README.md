@@ -103,19 +103,30 @@ Posts that aren't a take on football at all (game share text, off-topic chat, pu
 <!-- Where you collected from, how you labelled, your counts, and three hard
      cases. -->
 
-**Where the posts came from:**
+**Where the posts came from:** Public comments from r/soccer, pulled from 155
+threads across eight dates (Nov 2025 to Aug 2026) through the public Arctic Shift
+Reddit archive. Only comments of 12+ words were kept, which left 488 unique
+comments. 200 of them are in `labels.csv`, whole and untrimmed. Off-topic
+comments that aren't a take on football (game share text, off-topic chat, pure
+emotion) were left out rather than given a fourth label.
 
-**How I labelled them:** <!-- Cold first? Pre-labelled with AI and corrected?
-Say so plainly — the disclosure is required, not penalised. -->
+**How I labelled them:** I labelled 32 posts cold first, with no tools and only
+my definitions, and marked them `cold` in the note column. The other 168 were
+pre-labelled by an AI tool given my definitions; I then read and corrected each
+one, and they're marked `pre-labelled`. After the Milestone 2 decision rule was
+written, I re-checked every non-`analysis` post that contained a number or
+link, and every `analysis` post that didn't, against the rule. Three pre-labelled
+posts changed and are marked `pre-labelled, corrected`. No cold labels were
+changed.
 
 **Counts per label:**
 
 | Label | Count | Share |
 |---|---|---|
-|  |  |  |
-|  |  |  |
-|  |  |  |
-| **Total** |  | 100% |
+| `hot_take` | 103 | 51.5% |
+| `analysis` | 59 | 29.5% |
+| `reaction` | 38 | 19.0% |
+| **Total** | 200 | 100% |
 
 **Three hard cases**
 
@@ -123,25 +134,25 @@ Say so plainly — the disclosure is required, not penalised. -->
      been, and what you chose. These are worth more than the easy 190. -->
 
 **1.**
-> *The post:*
+> *The post:* "Oh no, a manager reform the club's squad to fit his style of play. Who had the highest wage bill last season in the PL btw? Inb4 it's because of "bonuses", the excuse that was never brought up when it was City topping it."
 >
-> *Could have been:*
+> *Could have been:* `reaction` or `analysis`
 >
-> *I chose, because:*
+> *I chose, because:* `analysis`. It's sarcastic and aimed at the other commenter, so it was first labelled `reaction`. But the whole point rests on a checkable fact (which club had the highest PL wage bill last season), and my rule says a checkable specific wins whatever the tone.
 
 **2.**
-> *The post:*
+> *The post:* "I used to grapple in Sunday league as a youth player. It's a contact sport. We all know this. There's a difference between the regular physicality of the sport and teams adopting a specific approach to crowd and target GKs and also wrestle to this level in the 6 yard box. If you don't know the difference you're being purposely dense."
 >
-> *Could have been:*
+> *Could have been:* `hot_take` or `reaction`
 >
-> *I chose, because:*
+> *I chose, because:* `reaction`. Most of the post argues about football, which is why it was first labelled `hot_take`. But it has no checkable fact (personal experience doesn't count), and it ends by calling the other commenter "purposely dense". With no fact, a post aimed at a commenter is `reaction`.
 
 **3.**
-> *The post:*
+> *The post:* "Let me clarify what I mean by quality. If this Arsenal team was up against City in 18/19 for example they are getting blown out of the water. Top to bottom the league has higher quality but up at the top the teams are the worst they've been in years. [...]"
 >
-> *Could have been:*
+> *Could have been:* `analysis` or `hot_take`
 >
-> *I chose, because:*
+> *I chose, because:* `hot_take`. "City in 18/19" sounds like evidence, but it names a team and not a fact. "They'd get blown out" is a hypothetical nobody can check. A named season or team only counts as a checkable specific when the post states something about it that could be looked up.
 
 ---
 

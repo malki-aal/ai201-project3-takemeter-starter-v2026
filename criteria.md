@@ -53,7 +53,7 @@ whether you hit them:
 
 ## 1. Overall accuracy is at least 0.65 on the held-out set, on every one of the three seeds
 
-**Why this target:** `hot_take` is 105 of my 200 posts, so a model that always
+**Why this target:** `hot_take` is 103 of my 200 posts, so a model that always
 guesses `hot_take` already scores about 0.52. That's the real floor, not the 0.33
 coin flip. The test split is about 30 posts, so 0.65 means roughly 20 right
 against the majority guesser's 16. Four extra posts per seed is a modest but
@@ -75,8 +75,8 @@ target because the small labels will drag the average down.
 ## 3. Every label clears its own F1 floor on every seed: `hot_take` ≥ 0.65, `analysis` ≥ 0.55, `reaction` ≥ 0.40
 
 **Why this target:** The floors follow how much data each label has and how
-easy its signal is. `hot_take` has 105 examples (~16 in each test split).
-`analysis` has 57 (~9 per split) and usually carries a visible cue: a number, a
+easy its signal is. `hot_take` has 103 examples (~16 in each test split).
+`analysis` has 59 (~9 per split) and usually carries a visible cue: a number, a
 fee, a link. `reaction` has only 38 examples, so about 6 land in each test
 split and one wrong post moves its F1 by 0.10 or more. Its boundary also depends on
 spotting a "you" or "this thread" target *and* the absence of a fact, which is
