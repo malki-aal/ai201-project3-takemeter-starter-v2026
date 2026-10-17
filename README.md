@@ -54,33 +54,45 @@
      The decision rule is worth a point on its own and it's the thing most
      people leave out. Every taxonomy has a hardest boundary. Name yours. -->
 
-### `label_one`
+### `analysis`
 
-**Definition:**
-
-**Example 1:**
->
-
-**Example 2:**
->
-
-### `label_two`
-
-**Definition:**
+**Definition:** A claim about football backed by at least one checkable specific (a stat, score, fee, date, named match or incident, or a link), whatever the tone.
 
 **Example 1:**
->
+> "Barcelona created 154 BCC in 38 games and conceded 97. That's an average of 4.05 BCC created per 90, while conceding 2.55 BCC per 90."
 
 **Example 2:**
->
+> I really don't think going from a 6 point lead to a 2 point lead is particularly crazy. Especially when Arsenal just had two away games against top 5 teams in the league
+
+### `hot_take`
+
+**Definition:** A confident opinion about football with no checkable specific behind it, even if it gives reasons.
+
+**Example 1:**
+> He's good in a one off game / cup competition but left a lot to be desired in the league.
+
+**Example 2:**
+> They are a small club to be fair. Next to no pressure from the media
+
+### `reaction`
+
+**Definition:** A reply aimed at another commenter or the thread (addressing, mocking or arguing with "you" or "people") that offers no checkable specific.
+
+**Example 1:**
+> Insulting me won't change the fact that you foul on corners and refs dont have the balls to do something.
+
+**Example 2:**
+> If you honestly believe it was handled well and they extended with 'plenty of time' then all the power to you. If my three best players all left it until the summer to sign a new deal and one of them left I would be livid.
 
 ### The hardest boundary
 
-**Which two labels:**
+**Which two labels:** `analysis` vs `reaction`: a reply that attacks another commenter *and* cites a fact.
 
-**The decision rule I used every time:**
-<!-- e.g. "If the post names a specific checkable fact, it's `analysis`, even
-     if the tone is heated." -->
+> 150m for the lowest team in la liga that is alot.. 99.9% of leagues and teams would kill for this revenue per season. you have no concept of money in football
+
+**The decision rule I used every time:** If the post names a checkable specific about football, it's `analysis`, even if it insults or addresses another commenter (the post above is `analysis` because of the 150m figure). Only with no checkable specific do I choose between the other two: aimed at a commenter or the thread → `reaction`; otherwise → `hot_take`. Reasons, vague appeals ("all season", "every time", "just watch him") and an "I think" don't make a checkable specific. A specific counts whether or not it's correct and whether or not it really proves the claim.
+
+Posts that aren't a take on football at all (game share text, off-topic chat, pure emotion like "crying at this final") were left out of the 200 rather than given a fourth label.
 
 
 
