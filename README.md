@@ -599,9 +599,9 @@ confident third was right 90–100% of the time.
 
 But no criterion moved from MISSED to MET, for two reasons:
 
-1. **`reaction` is still never predicted, on any seed.** All 17 `reaction`
-   posts across the three test splits went to `hot_take` (and one to
-   `analysis`). The model learned one boundary, not two. So this isn't
+1. **`reaction` is still never predicted, on any seed.** Of the 18 `reaction`
+   posts across the three test splits, 17 went to `hot_take` and 1 to
+   `analysis`. The model learned one boundary, not two. So this isn't
    undertraining any more: 10 epochs was enough for `analysis`, which has 59
    examples, and not enough for `reaction`, which has 38. That moves
    `reaction` onto diagnosis 3 (too few examples, about 27 in each training
