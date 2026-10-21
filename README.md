@@ -119,7 +119,7 @@ emotion) were left out rather than given a fourth label.
 
 **How I labelled them:** I labelled 32 posts cold first, with no tools and only
 my definitions, and marked them `cold` in the note column. The other 168 were
-pre-labelled by an AI tool ([NAME THE TOOL YOU USED]) given my definitions; I then read and corrected each
+pre-labelled by an AI tool (Claude) given my definitions; I then read and corrected each
 one, and they're marked `pre-labelled`. After the Milestone 2 decision rule was
 written, I re-checked every non-`analysis` post that contained a number or
 link, and every `analysis` post that didn't, against the rule. Three pre-labelled
@@ -263,7 +263,7 @@ already seen the trained numbers.
 
 **Pre-labelling disclosure:** 32 posts were labelled cold by me with no tools
 (`cold` in the note column). The other 168 were pre-labelled by
-**[NAME THE TOOL YOU USED]** from my definitions, then read and corrected by me
+**Claude** from my definitions, then read and corrected by me
 (`pre-labelled`). Three of those were corrected again after the Milestone 2
 rule was written (`pre-labelled, corrected`).
 
