@@ -252,18 +252,42 @@ rule was written (`pre-labelled, corrected`).
 
 | Measure | Baseline | Trained | Difference |
 |---|---|---|---|
-| Overall accuracy |  |  |  |
-| Macro F1 |  |  |  |
-| F1 — `label_one` |  |  |  |
-| F1 — `label_two` |  |  |  |
+| Overall accuracy | 0.300 | 0.500 | +0.200 |
+| Macro F1 | 0.297 | 0.222 | -0.075 |
+| F1 — `analysis` | 0.300 | 0.000 | -0.300 |
+| F1 — `hot_take` | 0.211 | 0.667 | +0.456 |
+| F1 — `reaction` | 0.381 | 0.000 | -0.381 |
+
+Baseline is `facebook/bart-large-mnli` zero-shot, given my definitions from
+`label_definitions.txt`, scored on the same 30 held-out posts in
+`test_split.csv` (9 analysis, 15 hot_take, 6 reaction) that the trained model
+was scored on (`baseline_results.json`).
+
+**What my definitions were worth:** I ran the baseline a second time with no
+definitions file, so it saw only the bare label names
+(`baseline_results_bare_names.json`). It did *better*: accuracy 0.533 vs.
+0.300, macro F1 0.398 vs. 0.297 (bare names scored analysis 0.000, hot_take
+0.650, reaction 0.545). So as zero-shot hypotheses my definitions cost 23
+points of accuracy instead of adding any. My guess is that long hypotheses
+like "This post is a claim about football backed by at least one checkable
+specific…" are hard for an NLI model to score, because they are rules about
+what a post contains, not descriptions of what it says. The table above
+reports the definitions run, as the milestone asks.
 
 **What I predicted before I looked:**
 <!-- Milestone 1 asks you to write this BEFORE seeing the trained numbers. A
      prediction made afterwards isn't one. -->
+TODO: write your own prediction here.
 
 **What the gap actually means:**
 <!-- If the baseline matched your trained model, your fine-tuning added
      nothing — and that is a real finding, not a failure. Say it plainly. -->
+The trained model's 0.500 accuracy is not a real win. It predicts `hot_take`
+for all 30 posts, so 0.500 is just the share of hot_take posts in the test
+set. Its macro F1 (0.222) is lower than the baseline's (0.297), and it never
+gets one analysis or reaction post right. The baseline at least tries to
+separate the three labels. As trained, my fine-tuning has learned only the
+majority class.
 
 
 
