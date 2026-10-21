@@ -307,11 +307,11 @@ majority class.
 
 | Criterion | Target | Seed 42 | Seed 7 | Seed 2024 | Verdict |
 |---|---|---|---|---|---|
-| 1. Overall accuracy | ≥ 0.65 | 0.500 | 0.500 | 0.500 | Miss |
-| 2. Macro F1 | ≥ 0.55 | 0.222 | 0.222 | 0.222 | Miss |
-| 3. Per-label F1 floors (`hot_take`/`analysis`/`reaction`) | ≥ 0.65 / 0.55 / 0.40 | 0.667 / 0.000 / 0.000 | 0.667 / 0.000 / 0.000 | 0.667 / 0.000 / 0.000 | Miss (`hot_take` passes, the other two score 0) |
-| 4. Agreement with staff labels | ≥ 24/30 | 30/30 | 30/30 | 30/30 | Met, but the 30 labels were made by Claude, not me (see Agreement Report) |
-| 5. Most-confident third minus least-confident third, accuracy | ≥ +0.20 | 0.70 − 0.20 = +0.50 | 0.70 − 0.40 = +0.30 | 0.50 − 0.10 = +0.40 | Met on paper, but meaningless (see below) |
+| 1. Overall accuracy | ≥ 0.65 | 0.500 | 0.500 | 0.500 | MISSED |
+| 2. Macro F1 | ≥ 0.55 | 0.222 | 0.222 | 0.222 | MISSED |
+| 3. Per-label F1 floors (`hot_take`/`analysis`/`reaction`) | ≥ 0.65 / 0.55 / 0.40 | 0.667 / 0.000 / 0.000 | 0.667 / 0.000 / 0.000 | 0.667 / 0.000 / 0.000 | MISSED (`hot_take` passes, the other two score 0) |
+| 4. Agreement with staff labels | ≥ 24/30 | 30/30 | 30/30 | 30/30 | MET (the 30 labels were made by Claude, not me; see Agreement Report) |
+| 5. Most-confident third minus least-confident third, accuracy | ≥ +0.20 | 0.70 − 0.20 = +0.50 | 0.70 − 0.40 = +0.30 | 0.50 − 0.10 = +0.40 | MET as written; criterion revised as broken (see `criteria.md`) |
 
 **Device:** CPU (`torch 2.14.1+cpu`), `distilbert-base-uncased`, 3 epochs,
 lr 2e-5, batch 16, max length 128. About 60 seconds of training per seed.
@@ -383,23 +383,72 @@ label.
 
 | # | Criterion | Target | Verdict | How I decided |
 |---|---|---|---|---|
-| 1 |  |  |  |  |
-| 2 |  |  |  |  |
-| 3 |  |  |  |  |
-| 4 |  |  |  |  |
-| 5 |  |  |  |  |
+| 1 | Overall accuracy, every seed | ≥ 0.65 | **MISSED** | 0.500 on all three seeds, 15 points short each time |
+| 2 | Macro F1, every seed | ≥ 0.55 | **MISSED** | 0.222 on all three seeds |
+| 3 | Per-label F1 floors, every seed | `hot_take` ≥ 0.65, `analysis` ≥ 0.55, `reaction` ≥ 0.40 | **MISSED** | `hot_take` clears it (0.667), but `analysis` and `reaction` are 0.000 on every seed. All three floors had to hold, so it's a miss |
+| 4 | Agreement with staff labels | ≥ 24/30 | **MET** | 30/30 from `agreement.py`. Caveat: the 30 labels were made by Claude, not me (see Agreement Report) |
+| 5 | Confident third ≥ 0.20 more accurate than unsure third, every seed | ≥ +0.20 | **MET as written**, but the criterion is broken (revised in `criteria.md`) | +0.50, +0.30, +0.40. But it passed for a model that predicts one label for everything, so it can't show that confidence means anything |
 
 **Diagnoses**
 
-<!-- For each miss: the cause, and how you know. The four common causes are:
-     too few examples for a label, a boundary you applied inconsistently, a
-     genuinely hard label pair, and a task the model can't reach from this
-     much data.
+Every miss (1, 2 and 3) has the same root: on every seed the model predicts
+`hot_take` for all 30 posts. So the question is *why* it collapsed. Of the
+four common causes, the evidence points mainly to **training, with label
+inconsistency on `analysis` vs. `hot_take` as a second cause and too few
+`reaction` examples as a third**.
 
-     ⚠️ Use your agreement report as evidence. It is the only instrument you
-     have that can tell a LABELLING problem from a MODEL problem, and this
-     section is graded on whether you used it that way. -->
+**1. Mainly a model/training problem: it never left the majority guess.**
+- *What I saw:* validation accuracy was 0.516 (the `hot_take` share of the
+  validation set) after epoch 1, 2 and 3 on all three seeds. Validation loss
+  was still falling at epoch 3 (seed 42: 1.014 → 0.986 → 0.976). A model that
+  had finished learning would have stopped improving. This one was still
+  moving and hadn't yet crossed the point where any non-`hot_take` guess wins.
+- *Why:* about 140 training posts, batch 16 and 3 epochs is only 27 gradient
+  steps at lr 2e-5. That's very little training for a 66M-parameter model.
+- *How I know the labels aren't the main problem:* a two-line keyword rule I
+  wrote (a digit, link or currency sign → `analysis`; "you", "people" or
+  "lol" → `reaction`; otherwise `hot_take`) scores **macro F1 0.414 on the
+  same 30 test posts** (0.581 across all 200), against the model's 0.222 and
+  the zero-shot baseline's 0.297. If the labels were noise, a crude rule
+  couldn't beat the model on them. The signal is in the data, and the
+  fine-tuned model didn't train long enough to find it.
+- *So it isn't "a task the model can't reach from 200 examples".* That
+  can't be decided until the model has actually been trained enough to try.
+  This is the thing to fix in Milestone 5.
 
+**2. Second cause: I applied the `analysis`/`hot_take` boundary
+inconsistently.**
+- *My agreement report can't decide this one.* It came back 30/30, but
+  Claude labelled those 30 and the staff rules are tighter than mine, so it
+  says nothing about how consistently my own 200 were labelled. I had to
+  check `labels.csv` directly instead.
+- *What I found:* 13 of my 103 `hot_take` posts contain a number, and 25 of
+  my 59 `analysis` posts contain none. Some of those are fine under my
+  definition (a "named match or incident" counts as a specific with no
+  digits). But some pairs are labelled opposite ways for the same kind of
+  evidence:
+  - *"Pretty sure Arsenal has the second highest wage bill in the league"* →
+    `analysis`, yet *"People have complained about Chelsea for 20 years…"* →
+    `hot_take`. Both give one vague, checkable-in-principle fact.
+  - *"The fact Pep had to buy Guehi and Semenyo to keep up is embarrassing"*
+    → `analysis` because it names signings. Under the staff set's rule 1,
+    the names are decoration on a conclusion already reached, and my own
+    definition has no rule for decoration at all.
+- *Why it happened:* 165 of my 200 labels were AI-pre-labelled and only 3
+  were changed when I reviewed them. My definition says *any* checkable
+  specific makes a post `analysis`, but in football almost every post names
+  a player or a club, so "specific" was stretched case by case.
+- *What it costs:* this makes `analysis` harder to learn, but it doesn't
+  explain an F1 of exactly 0. That's cause 1. Once the model trains properly,
+  I expect this to be the boundary where errors pile up.
+
+**3. Third cause: too few `reaction` examples.**
+- `reaction` has 38 posts, which leaves about 27 for training and 6 per test
+  split, so one post moves its F1 by roughly 0.15.
+- Even the keyword rule only reaches 0.143 on `reaction` in the test split.
+  That suggests the "aimed at another commenter" cue is genuinely harder than
+  spotting a number, as I predicted in criterion 3. I can't separate "too
+  few" from "genuinely hard" until the model is past cause 1.
 
 
 ---

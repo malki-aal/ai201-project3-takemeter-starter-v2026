@@ -108,6 +108,23 @@ confident predictions to be the `analysis` posts with obvious numbers in them.
 I expect unsure ones to be on the `hot_take`/`reaction` boundary, where a
 "you" might or might not make the post about the person.
 
+> **Revised in unit 6:** The model's most-confident third of test
+> predictions is at least 0.20 more accurate than its least-confident third,
+> on every seed, **counted only on a seed where the model predicts at least
+> two different labels.** On a seed where every prediction is the same label,
+> the criterion can't be judged.
+>
+> **Why revised:** As written, this criterion passed (+0.50, +0.30, +0.40)
+> for a model that predicted `hot_take` for all 30 posts on every seed. With
+> one label for everything, the confidence score only ranks how
+> `hot_take`-like each post looks, so the "confident third" is right more
+> often just because it holds more real `hot_take` posts. Mean confidence was
+> about 0.50 whether the model was right or wrong. The criterion was meant to
+> test whether a confident guess deserves more trust than an unsure one, and
+> it couldn't measure that. The target number is unchanged, and the revision
+> makes the criterion harder to pass, not easier. Under the revision,
+> criterion 5 can't be judged on any of the three "before" seeds.
+
 ---
 
 <!-- ─────────────────────────────────────────────────────────────────────────
