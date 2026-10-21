@@ -307,28 +307,71 @@ majority class.
 
 | Criterion | Target | Seed 42 | Seed 7 | Seed 2024 | Verdict |
 |---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |
+| 1. Overall accuracy | ≥ 0.65 | 0.500 | 0.500 | 0.500 | Miss |
+| 2. Macro F1 | ≥ 0.55 | 0.222 | 0.222 | 0.222 | Miss |
+| 3. Per-label F1 floors (`hot_take`/`analysis`/`reaction`) | ≥ 0.65 / 0.55 / 0.40 | 0.667 / 0.000 / 0.000 | 0.667 / 0.000 / 0.000 | 0.667 / 0.000 / 0.000 | Miss (`hot_take` passes, the other two score 0) |
+| 4. Agreement with staff labels | ≥ 24/30 | — | — | — | Not measured yet (`agreement.py`, Agreement Report below) |
+| 5. Most-confident third minus least-confident third, accuracy | ≥ +0.20 | 0.70 − 0.20 = +0.50 | 0.70 − 0.40 = +0.30 | 0.50 − 0.10 = +0.40 | Met on paper, but meaningless (see below) |
+
+**Device:** CPU (`torch 2.14.1+cpu`), `distilbert-base-uncased`, 3 epochs,
+lr 2e-5, batch 16, max length 128. About 60 seconds of training per seed.
+Every seed's test split held 30 posts: 9 analysis, 15 hot_take, 6 reaction.
+Raw numbers are in `results_three_seeds_before.json`.
+
+The notebook's spread table, as printed:
+
+| Measure | Seed 42 | Seed 7 | Seed 2024 | Spread |
+|---|---|---|---|---|
+| Overall accuracy | 0.500 | 0.500 | 0.500 | 0.000 |
+| Macro F1 | 0.222 | 0.222 | 0.222 | 0.000 |
+| F1 — `analysis` | 0.000 | 0.000 | 0.000 | 0.000 |
+| F1 — `hot_take` | 0.667 | 0.667 | 0.667 | 0.000 |
+| F1 — `reaction` | 0.000 | 0.000 | 0.000 | 0.000 |
+
+**About the spread:** the notebook calls a spread of 0.000 "stable enough to
+trust", but that's misleading here. Every seed gives the same numbers because
+every seed learned the same thing: always guess `hot_take`. A model that
+ignores its input can't be affected by which posts land in the test split.
+Stratified splitting keeps the label counts at 15/9/6 every time, so the score
+is the same too. Zero spread here means the model collapsed, not that it's
+reliable. The training logs show why. Validation loss was still falling at
+epoch 3 on every seed (seed 42: 1.014 → 0.986 → 0.976), while validation
+accuracy stayed at the majority-class rate (0.516) after every epoch. With
+about 140 training posts, batch 16 and 3 epochs, that's only 27 gradient
+steps at lr 2e-5. That isn't enough to move it off the majority-class guess,
+so it's underfit, not unstable.
+
+**About criterion 5:** it passes on every seed, but every prediction is
+`hot_take`, so the confidence score is only saying which posts look *more*
+`hot_take`-like. The "confident third" scores higher just because more of it
+is real `hot_take`. Mean confidence was about 0.50 whether the model was
+right or wrong (seed 42: 0.515 vs. 0.488). I'm counting it as met on paper,
+not as evidence that the model's confidence means anything.
 
 ### Confusion matrix
 
 <!-- ⚠️ TYPED AS A MARKDOWN TABLE. The notebook prints one ready to paste.
      An image of a matrix earns nothing. -->
 
-| true \ predicted |  |  |  |
+Seed 42 (seeds 7 and 2024 are identical):
+
+| true \ predicted | analysis | hot_take | reaction |
 |---|---|---|---|
-| **** |  |  |  |
-| **** |  |  |  |
-| **** |  |  |  |
+| **analysis** | 0 | 9 | 0 |
+| **hot_take** | 0 | 15 | 0 |
+| **reaction** | 0 | 6 | 0 |
 
 **My biggest off-diagonal number, and what it means:**
 <!-- Not "the model made mistakes" — WHICH boundary it didn't learn, and which
      direction. "7 real analysis posts were called hot_take and only 3 went the
      other way" is a direction, not just an error rate. -->
-
+All 9 real `analysis` posts were called `hot_take` and none went the other
+way. So the model never learned my main boundary, the checkable specific that
+separates `analysis` from `hot_take`. It treats every confident football
+opinion as a hot take, whether or not it has a stat, score, fee or link. The
+same thing happens to all 6 `reaction` posts, so this isn't one hard boundary.
+The model has learned no boundaries at all and just predicts the majority
+label.
 
 
 ---
