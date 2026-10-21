@@ -232,6 +232,35 @@ changed.
 README write-ups (Label Taxonomy, The Dataset, The Training Run, this section),
 set up the `.venv` and ran notebook sections 1–5. I read and kept what it wrote.
 
+**Moment 3: telling a labelling problem from a model problem (unit 6,
+Milestone 4)**
+
+- *What I asked for:* after the model predicted `hot_take` for every post on
+  every seed, I asked Claude to diagnose why, using the training logs and my
+  labels.
+- *What came back:* two checks. First, it profiled `labels.csv` against my own
+  rule and found 13 `hot_take` posts with numbers and 25 `analysis` posts
+  without any, including pairs labelled opposite ways for the same kind of
+  evidence. Second, it wrote a two-line keyword rule (number or link →
+  `analysis`, "you"/"people" → `reaction`, otherwise `hot_take`). That rule
+  scored macro F1 0.414 on my test split, beating both my model (0.222) and
+  the zero-shot baseline (0.297). That pattern was what showed the model was
+  undertrained, not that the labels were noise.
+- *What I changed:* I made the Milestone 5 change a training setting (3 → 10
+  epochs) and not relabelling, because the keyword rule showed the signal
+  was already in the data. It worked for `analysis` and not for `reaction`,
+  which is in What's Still Broken.
+
+**Other AI help in unit 6, disclosed:** Claude (Claude Code) ran
+`baseline.py` with and without my definitions, ran the notebook's sections
+1, 6 and 7 for both three-seed runs, and drafted the unit 6 README sections
+(Baseline vs. Trained, both Run Logs, Verdicts and Diagnoses, the Agreement
+Report, The Improvement and this section). With my mentor's OK, Claude also
+made the 30 labels in `my_staff_labels.csv`, so my agreement rate measures
+how an AI applies the staff rules, not how I do (see Agreement Report). The
+"prediction" in Baseline vs. Trained is a reconstruction, because I'd
+already seen the trained numbers.
+
 **Pre-labelling disclosure:** 32 posts were labelled cold by me with no tools
 (`cold` in the note column). The other 168 were pre-labelled by
 **[NAME THE TOOL YOU USED]** from my definitions, then read and corrected by me
@@ -623,12 +652,52 @@ But no criterion moved from MISSED to MET, for two reasons:
 
 <!-- For each criterion still missed: what you'd do, and why you stopped. -->
 
+After the 10-epoch run, criteria 1, 2 and 3 are still MISSED. They share one
+cause: the model never predicts `reaction`. Criteria 4 and 5 are MET.
 
+**Criterion 3 (`reaction` F1 ≥ 0.40): 0.000 on every seed.**
+- *What I'd do:* add 30 more `reaction` posts, the brief's "add examples to
+  your thinnest label". That takes `reaction` from 38 to 68 and from about 27
+  to about 48 training examples per split, and it adds about 4 more test posts
+  per split, so the F1 stops jumping 0.15 per post. I'd label them cold, by
+  hand, under my own rule ("aimed at another commenter or the thread, with no
+  checkable specific"), because most of my existing labels were AI
+  pre-labels.
+- *Why I stopped:* Milestone 5 allows one change, and the evidence pointed
+  first at training. Adding examples to `reaction` is a second change, and
+  running it in the same "after" run would have made the two impossible to
+  tell apart. I also ran out of time to label 30 new posts with the same care
+  as the first batch.
+
+**Criteria 1 and 2 (accuracy ≥ 0.65, macro F1 ≥ 0.55): missed on seeds 42
+and 7, met only on seed 2024.**
+- *What I'd do:* first the `reaction` examples above, since a label that
+  scores 0 caps macro F1 at about 0.67 however good the other two are. Then
+  relabel the `analysis`/`hot_take` boundary in `labels.csv` once, adding a
+  rule like the staff set's rule 1 (a named player or a number that just
+  decorates a conclusion doesn't make a post `analysis`). Milestone 4 found
+  13 `hot_take` posts with numbers and 25 `analysis` posts without any, with
+  pairs labelled opposite ways for the same kind of evidence. Seeds 42 and 7
+  still send 3–5 `analysis` posts to `hot_take`, which is where those
+  inconsistent labels would show.
+- *Why I stopped:* the same one-change rule, and time. There's also a limit
+  that more work wouldn't remove: with 30-post test splits, accuracy moved
+  0.167 across seeds. A criterion that has to hold on every seed can be
+  decided by which 6 `reaction` posts land in the test split. A real fix
+  would be more data overall or cross-validation, not another tweak.
 
 **The gap between what I meant my labels to capture and what the model
 learned:**
 <!-- Two sentences. Your confusion matrix is the evidence. -->
-
+I meant my labels to capture two things: whether a post rests on a checkable
+specific, and whether it's aimed at another commenter. The model learned
+only the first one. After 10 epochs it puts most `analysis` posts in the
+right row (4, 6 and 8 of 9 by seed), but it sends 17 of the 18 `reaction`
+posts to `hot_take` and predicts `reaction` zero times on any seed. To the
+model, "argues with *you* and offers no fact" looks the same as "offers no
+fact". That means the commenter-targeting part of my definition, the part
+that makes `reaction` mine and not the staff's, never made it out of my head
+and into what 27 training examples could teach.
 
 
 <!-- ═════════════════════════════════════════════════════════════════════
