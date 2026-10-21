@@ -277,7 +277,14 @@ reports the definitions run, as the milestone asks.
 **What I predicted before I looked:**
 <!-- Milestone 1 asks you to write this BEFORE seeing the trained numbers. A
      prediction made afterwards isn't one. -->
-TODO: write your own prediction here.
+I didn't write a prediction down before the trained numbers were in front of
+me, because `results.json` came out of the previous unit. So what follows is a
+reconstruction, not a real prediction. Going by the label design, I would have
+expected the trained model to beat the baseline most clearly on `analysis`. Its
+rule is about the post's surface (a stat, score, fee, date or link), which is
+something fine-tuning on 200 examples can pick up and a zero-shot model reading
+a definition can't. In fact the trained model scored 0.000 on `analysis` and
+beat the baseline only on `hot_take`, the majority class.
 
 **What the gap actually means:**
 <!-- If the baseline matched your trained model, your fine-tuning added
