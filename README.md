@@ -412,6 +412,26 @@ label.
      data/staff_taxonomy.md, not your own — so every argument below is made
      from those definitions and those decision rules. -->
 
+**Who labelled the 30:** With my mentor's OK, the 30 labels in
+`my_staff_labels.csv` were made by Claude (an AI assistant), applying
+`data/staff_taxonomy.md` as written. They were committed before
+`data/staff_labels.csv` was opened. So this rate measures how an AI applies
+the staff rules, not how I do, and it's weaker evidence about the
+consistency of my own 200 labels.
+
+Labelling notes, for the borderline posts:
+- `sp_005`, `sp_007`: both open with a general claim ("Carbon plates aren't
+  the whole story", "it's more than that"). Labelled `analysis` because the
+  numbers (2% + 2% with the mileage change; 90 seconds in 4C vs. 24C) are
+  the reason for the claim, not decoration (rule 1).
+- `sp_002`, `sp_010`: one-runner or three-runner data. Labelled `analysis`
+  because a small sample is still a checkable fact that carries the argument.
+- `sp_014`: `hot_take`. It's almost exactly rule 1's own example: the 3% is a
+  flourish on "obviously the shoes are the whole story".
+- `sp_023`, `sp_027`: contain numbers (eight weeks, two miles, 20 degrees)
+  but argue nothing; they report what just happened and how it felt, so
+  `reaction` (rules 2 and 3).
+
 **Agreement rate:** ___ / 30 = ___%
 
 <!-- Nobody grades this number. A 60% who argues every disagreement from the
