@@ -310,7 +310,7 @@ majority class.
 | 1. Overall accuracy | ≥ 0.65 | 0.500 | 0.500 | 0.500 | Miss |
 | 2. Macro F1 | ≥ 0.55 | 0.222 | 0.222 | 0.222 | Miss |
 | 3. Per-label F1 floors (`hot_take`/`analysis`/`reaction`) | ≥ 0.65 / 0.55 / 0.40 | 0.667 / 0.000 / 0.000 | 0.667 / 0.000 / 0.000 | 0.667 / 0.000 / 0.000 | Miss (`hot_take` passes, the other two score 0) |
-| 4. Agreement with staff labels | ≥ 24/30 | — | — | — | Not measured yet (`agreement.py`, Agreement Report below) |
+| 4. Agreement with staff labels | ≥ 24/30 | 30/30 | 30/30 | 30/30 | Met, but the 30 labels were made by Claude, not me (see Agreement Report) |
 | 5. Most-confident third minus least-confident third, accuracy | ≥ +0.20 | 0.70 − 0.20 = +0.50 | 0.70 − 0.40 = +0.30 | 0.50 − 0.10 = +0.40 | Met on paper, but meaningless (see below) |
 
 **Device:** CPU (`torch 2.14.1+cpu`), `distilbert-base-uncased`, 3 epochs,
@@ -432,7 +432,7 @@ Labelling notes, for the borderline posts:
   but argue nothing; they report what just happened and how it felt, so
   `reaction` (rules 2 and 3).
 
-**Agreement rate:** ___ / 30 = ___%
+**Agreement rate:** 30 / 30 = 100%
 
 <!-- Nobody grades this number. A 60% who argues every disagreement from the
      stated rules beats a 95% who wrote "staff was right" nine times. Several
@@ -441,39 +441,48 @@ Labelling notes, for the borderline posts:
 
 **Disagreements**
 
-<!-- Three lines each: the post, both labels, and who you think is right and
-     why — grounded in the staff definitions you were both applying.
+None. `agreement.py` found 0 disagreements across the 30 posts
+(`agreement_results.json`), so there's nothing to sort into piles (a), (b)
+or (c).
 
-     Then sort each into one of three piles:
-       (a) the rule covered it and I applied it loosely → a consistency problem
-       (b) the rule genuinely doesn't say               → a gap in the definitions
-       (c) the rule is ambiguous here and my reading is defensible → argue it.
-           This is a legitimate win.
+**Were the hard posts actually hard?** Staff flagged 7 of the 30 as
+borderline. Here is how each one was decided, and whether I'd flagged it
+beforehand in the labelling notes above:
 
-     Pile (a) is the one that matters most for your diagnosis: if you applied a
-     written rule two different ways on 30 posts, that is direct evidence about
-     what you did across your own 200. -->
-
-**1.**
-> *The post:*
->
-> *Staff said / I said:*
->
-> *My call, and why:*
->
-> *Which pile:*
-
-**2.**
-> *The post:*
->
-> *Staff said / I said:*
->
-> *My call, and why:*
->
-> *Which pile:*
+| Post | Label | The rule that decided it | Flagged before seeing the key? |
+|---|---|---|---|
+| `sp_005` | analysis | Rule 1: the opening clause sounds like a hot take, but the 2% + 2% with only mileage changing is the argument | Yes |
+| `sp_010` | analysis | Rule 1: hedged and a tiny sample, but the observation is checkable and the claim rests on it | Yes |
+| `sp_014` | hot_take | Rule 1: the 3% is decoration; "so obviously" does the work | Yes |
+| `sp_019` | hot_take | Rule 2: reflective tone, but it makes a general claim about everyone, not a report of the writer's day | No |
+| `sp_020` | hot_take | Rule 1: sounds observational, but no count is given | No |
+| `sp_028` | reaction | Rule 3: "third this year" is countable, but nothing is argued from it | No |
+| `sp_029` | reaction | Rule 2: a shoe observation, but it reports the writer's own realisation, now | No |
 
 **What the pattern in my disagreements tells me:**
 
+There's no pattern to read, because there were no disagreements. I don't
+think 100% means the rules are airtight, for three reasons:
+
+1. **The set is cleanly blocked.** Posts 1–10 are all `analysis`, 11–20 all
+   `hot_take` and 21–30 all `reaction`, so 23 of the 30 aren't close calls.
+   The real test was the 7 flagged posts. All 7 matched, but 4 of them
+   (`sp_019`, `sp_020`, `sp_028`, `sp_029`) weren't flagged as borderline
+   when labelling. They were decided by the rules without ever feeling
+   difficult.
+2. **The staff rules are tighter than mine.** Each boundary has a written
+   test with a worked example (rule 1's 3% example is almost `sp_014` word for
+   word). My own taxonomy has one test, "is there a checkable specific", and
+   no rule for when a fact is decoration. The staff set has
+   decoration-vs-load-bearing as rule 1. Under my definitions, `sp_014` and
+   `sp_020`-style posts would be much harder to call.
+3. **The labeller wasn't me.** As noted above, Claude made these 30 labels.
+   So 100% shows that the staff rules can be applied consistently as
+   written. It isn't direct evidence that I applied *my* rules consistently
+   across my 200. For Milestone 4, the honest reading is that this check
+   doesn't rule out inconsistency in `labels.csv`. Most of those 200 were
+   AI-pre-labelled and then corrected by hand, and the model collapsing to
+   `hot_take` means the labels need checking directly.
 
 
 ---
