@@ -538,25 +538,83 @@ think 100% means the rules are airtight, for three reasons:
 
 ## The Improvement
 
-**What I changed:**
+**What I changed:** One training setting: `EPOCHS` went from 3 to 10 in
+section 2 of the notebook. Everything else is the same: same `labels.csv`,
+same three seeds (so the same splits), lr 2e-5, batch 16, max length 128,
+`distilbert-base-uncased`, on the same CPU. That's 90 gradient steps instead
+of 27, and about 3.5 minutes per seed instead of 1. I picked 10 before
+running anything and ran it once. I didn't try several values and keep the
+best one, because that would be tuning against the test split.
 
-**Which diagnosis pointed at it:**
+**Which diagnosis pointed at it:** Diagnosis 1. Validation accuracy sat at
+the majority-class rate after every epoch while validation loss was still
+falling at epoch 3. That's a model that hadn't finished training, not one
+that had learned the wrong thing. A two-line keyword rule beating it (macro F1
+0.414 vs. 0.222) showed the labels already held a learnable signal. I left
+relabelling `analysis`/`hot_take` (diagnosis 2) and adding `reaction` posts
+(diagnosis 3) for later, so this run measures one change only.
 
 ### Run Log — After
 
 | Criterion | Target | Seed 42 | Seed 7 | Seed 2024 | Verdict |
 |---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |
+| 1. Overall accuracy | ≥ 0.65 | 0.600 | 0.633 | 0.767 | **MISSED** (only seed 2024 clears it) |
+| 2. Macro F1 | ≥ 0.55 | 0.424 | 0.463 | 0.584 | **MISSED** (only seed 2024 clears it) |
+| 3. Per-label F1 floors (`hot_take`/`analysis`/`reaction`) | ≥ 0.65 / 0.55 / 0.40 | 0.700 / 0.571 / 0.000 | 0.722 / 0.667 / 0.000 | 0.811 / 0.941 / 0.000 | **MISSED** (`hot_take` and `analysis` now pass on every seed; `reaction` is still 0) |
+| 4. Agreement with staff labels | ≥ 24/30 | 30/30 | 30/30 | 30/30 | **MET** (unchanged; it doesn't depend on training) |
+| 5. Confident third vs. unsure third (revised) | ≥ +0.20 | 0.90 − 0.40 = +0.50 | 0.90 − 0.50 = +0.40 | 1.00 − 0.50 = +0.50 | **MET**, including under the revision: the model now predicts two labels on every seed |
+
+Raw numbers are in `results_three_seeds_after.json`. The before log is in
+**Run Log — Before** above.
+
+**Before vs. after, side by side:**
+
+| Measure | Before (3 epochs), all three seeds | After (10 epochs), 42 / 7 / 2024 | Change |
+|---|---|---|---|
+| Overall accuracy | 0.500 / 0.500 / 0.500 | 0.600 / 0.633 / 0.767 | +0.100 to +0.267 |
+| Macro F1 | 0.222 / 0.222 / 0.222 | 0.424 / 0.463 / 0.584 | +0.202 to +0.362 |
+| F1 — `analysis` | 0.000 / 0.000 / 0.000 | 0.571 / 0.667 / 0.941 | +0.571 to +0.941 |
+| F1 — `hot_take` | 0.667 / 0.667 / 0.667 | 0.700 / 0.722 / 0.811 | +0.033 to +0.144 |
+| F1 — `reaction` | 0.000 / 0.000 / 0.000 | 0.000 / 0.000 / 0.000 | none |
+| Accuracy spread across seeds | 0.000 | 0.167 | |
+
+Confusion matrix after, seed 42 (the notebook prints the first seed):
+
+| true \ predicted | analysis | hot_take | reaction |
+|---|---|---|---|
+| **analysis** | 4 | 5 | 0 |
+| **hot_take** | 1 | 14 | 0 |
+| **reaction** | 0 | 6 | 0 |
 
 **Did it help, and how do I know:**
 
-<!-- If it didn't, say so. Relabelling that didn't help is a genuinely
-     interesting result and earns full credit. -->
+Yes, for `analysis`, and that's the whole improvement. Every seed improved
+on every measure except `reaction`. Macro F1 went up by at least 0.20 on
+every seed, and `analysis` went from 0.000 to between 0.571 and 0.941, which
+now clears its 0.55 floor on all three seeds. The model learned the
+checkable-specific boundary once it had enough steps to do it. On seed 2024
+only 1 of 9 `analysis` posts went to `hot_take`, against all 9 before.
+Criterion 5 also now means something: with two labels in play, the model's
+confident third was right 90–100% of the time.
 
+But no criterion moved from MISSED to MET, for two reasons:
+
+1. **`reaction` is still never predicted, on any seed.** All 17 `reaction`
+   posts across the three test splits went to `hot_take` (and one to
+   `analysis`). The model learned one boundary, not two. So this isn't
+   undertraining any more: 10 epochs was enough for `analysis`, which has 59
+   examples, and not enough for `reaction`, which has 38. That moves
+   `reaction` onto diagnosis 3 (too few examples, about 27 in each training
+   split), which this change didn't touch. My next change would be the
+   brief's "add examples to your thinnest label": 30 more `reaction` posts.
+2. **The result now depends on the split.** Accuracy moved 0.167 across
+   seeds (0.600 to 0.767), more than the 10-point line the notebook treats
+   as a stable measure. Before, the spread was 0.000 only because the model
+   ignored its input. Now that it reads the posts, 30-post test sets with 6
+   `reaction` and 9 `analysis` posts make the score depend on which posts
+   land where. Seed 2024 clears criteria 1 and 2 and the other two don't, so
+   0.767 is a friendly draw, not the model's level. That's diagnosis 3 again:
+   the dataset is too small for a stable measure.
 
 
 ---
